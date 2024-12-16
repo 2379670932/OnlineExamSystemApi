@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
-//选择题
+
 @Mapper
 public interface MultiQuestionMapper {
     /**
@@ -29,13 +29,13 @@ public interface MultiQuestionMapper {
     MultiQuestion findOnlyQuestionId();
 
     @Options(useGeneratedKeys = true,keyProperty = "questionId")
-    @Insert("insert into multi_question(subject,question,answerA,answerB,answerC,answerD,rightAnswer,analysis,section,level) " +
-            "values(#{subject},#{question},#{answerA},#{answerB},#{answerC},#{answerD},#{rightAnswer},#{analysis},#{section},#{level})")
+    @Insert("insert into multi_question(subject,question,answerA,answerB,answerC,answerD,rightAnswer,analysis,section,level,score) " +
+            "values(#{subject},#{question},#{answerA},#{answerB},#{answerC},#{answerD},#{rightAnswer},#{analysis},#{section},#{level}, #{score})")
     int add(MultiQuestion multiQuestion);
 
-    @Select("select questionId from multi_question  where subject =#{subject} order by rand() desc limit #{pageNo}")
-    List<Integer> findBySubject(@Param("subject") String subject, @Param("pageNo") Integer pageNo);
+    @Select("select questionId,score from multi_question  where subject =#{subject} AND questionId not in(select questionId from paper_manage where paperId = #{paperId} and questionType = '1') order by rand() desc")
+    List<MultiQuestion> findBySubject(@Param("subject") String subject,@Param("paperId") Integer paperId);
 
-    @Update("update multi_question set subject = #{subject}, question = #{question}, answerA = #{answerA}, answerB = #{answerB}, answerC = #{answerC}, answerD = #{answerD}, rightAnswer = #{rightAnswer}, analysis = #{analysis}, section = #{section}, level = #{level} where questionId = #{questionId}")
+    @Update("update multi_question set subject = #{subject}, question = #{question}, answerA = #{answerA}, answerB = #{answerB}, answerC = #{answerC}, answerD = #{answerD}, rightAnswer = #{rightAnswer}, analysis = #{analysis}, section = #{section}, level = #{level}, score = #{score} where questionId = #{questionId}")
     int edit(MultiQuestion multiQuestion);
 }

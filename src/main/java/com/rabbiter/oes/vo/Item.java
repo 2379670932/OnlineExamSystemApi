@@ -13,6 +13,35 @@ public class Item {
 
     private Integer judgeNumber;
 
+    private Integer changeTotalScore;
+
+    private Integer fillTotalScore;
+
+    private Integer judgeTotalScore;
+
+    public Integer getChangeTotalScore() {
+        return changeTotalScore;
+    }
+
+    public void setChangeTotalScore(Integer changeTotalScore) {
+        this.changeTotalScore = changeTotalScore;
+    }
+
+    public Integer getFillTotalScore() {
+        return fillTotalScore;
+    }
+
+    public void setFillTotalScore(Integer fillTotalScore) {
+        this.fillTotalScore = fillTotalScore;
+    }
+
+    public Integer getJudgeTotalScore() {
+        return judgeTotalScore;
+    }
+
+    public void setJudgeTotalScore(Integer judgeTotalScore) {
+        this.judgeTotalScore = judgeTotalScore;
+    }
     public String getSubject() {
         return subject;
     }

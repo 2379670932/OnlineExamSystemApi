@@ -18,6 +18,7 @@ public interface JudgeQuestionMapper {
     @Select("select * from judge_question")
     IPage<JudgeQuestion> findAll(Page page);
 
+
     /**
      * 查询最后一条记录的questionId
      * @return JudgeQuestion
@@ -25,13 +26,13 @@ public interface JudgeQuestionMapper {
     @Select("select questionId from judge_question order by questionId desc limit 1")
     JudgeQuestion findOnlyQuestionId();
 
-    @Insert("insert into judge_question(subject,question,answer,analysis,level,section) values " +
-            "(#{subject},#{question},#{answer},#{analysis},#{level},#{section})")
+    @Insert("insert into judge_question(subject,question,answer,analysis,level,section,score) values " +
+            "(#{subject},#{question},#{answer},#{analysis},#{level},#{section}, #{score})")
     int add(JudgeQuestion judgeQuestion);
 
-    @Select("select questionId from judge_question  where subject=#{subject}  order by rand() desc limit #{pageNo}")
-    List<Integer> findBySubject(@Param("subject") String subject, @Param("pageNo") Integer pageNo);
+    @Select("select questionId,score from judge_question  where subject=#{subject} AND questionId not in(select questionId from paper_manage where paperId = #{paperId} and questionType = '3') order by rand() desc")
+    List<JudgeQuestion> findBySubject(@Param("subject") String subject,@Param("paperId") Integer paperId);
 
-    @Update("update judge_question set subject = #{subject}, question = #{question}, answer = #{answer}, section = #{section}, analysis = #{analysis}, level = #{level} where questionId = #{questionId}")
+    @Update("update judge_question set subject = #{subject}, question = #{question}, answer = #{answer}, section = #{section}, analysis = #{analysis}, level = #{level} , score = #{score} where questionId = #{questionId}")
     int edit(JudgeQuestion judgeQuestion);
 }

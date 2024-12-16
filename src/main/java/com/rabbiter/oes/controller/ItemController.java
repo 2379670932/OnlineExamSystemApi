@@ -1,7 +1,6 @@
 package com.rabbiter.oes.controller;
 
-import com.rabbiter.oes.entity.ApiResult;
-import com.rabbiter.oes.entity.PaperManage;
+import com.rabbiter.oes.entity.*;
 import com.rabbiter.oes.service.PaperService;
 import com.rabbiter.oes.serviceimpl.FillQuestionServiceImpl;
 import com.rabbiter.oes.serviceimpl.JudgeQuestionServiceImpl;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -42,45 +42,53 @@ public class ItemController {
         Integer paperId = item.getPaperId();
 
         // 数据库获取数据
-        List<Integer> changeNumbers = multiQuestionService.findBySubject(item.getSubject(), changeNumber);
-        List<Integer> fills = fillQuestionService.findBySubject(item.getSubject(), fillNumber);
-        List<Integer> judges = judgeQuestionService.findBySubject(item.getSubject(), judgeNumber);
-
-        if(changeNumbers == null || changeNumbers.size() != changeNumber){
-            return ApiResultHandler.buildApiResult(400,"科目【" + item.getSubject() + "】题库【选择题】题目数量不足【" + changeNumber + "】，组卷失败",null);
+        List<MultiQuestion> changeNumberList=new ArrayList<>();
+        if (changeNumber!=null &&changeNumber>0){
+            changeNumberList = multiQuestionService.findBySubject(item.getSubject(), changeNumber,item.getChangeTotalScore(),item.getPaperId());
+            if (changeNumberList == null || changeNumberList.size() != changeNumber) {
+                return ApiResultHandler.buildApiResult(400, "科目【" + item.getSubject() + "】题库【选择题】题目数量不足【" + changeNumber + "】或者该主题的题目分数不足当前总分【" + item.getChangeTotalScore() + "】，组卷失败", null);
+            }
         }
-        if(fills == null || fills.size() != fillNumber) {
-            return ApiResultHandler.buildApiResult(400,"科目【" + item.getSubject() + "】题库【填空题】题目数量不足【" + fillNumber + "】，组卷失败",null);
+        List<FillQuestion> fillList=new ArrayList<>();
+        if (fillNumber!=null &&fillNumber>0){
+            fillList = fillQuestionService.findBySubject(item.getSubject(), fillNumber,item.getFillTotalScore(),item.getPaperId());
+            if (fillList == null || fillList.size() != fillNumber) {
+                return ApiResultHandler.buildApiResult(400, "科目【" + item.getSubject() + "】题库【填空题】题目数量不足【" + fillNumber + "】或者该主题的题目分数不足当前总分【" + item.getFillTotalScore() + "】，组卷失败", null);
+            }
         }
-        if(judges == null || judges.size() != judgeNumber){
-            return ApiResultHandler.buildApiResult(400,"科目【" + item.getSubject() + "】题库【判断题】题目数量不足【" + judgeNumber + "】，组卷失败",null);
+        List<JudgeQuestion> judges=new ArrayList<>();
+        if (judgeNumber!=null &&judgeNumber>0){
+            judges = judgeQuestionService.findBySubject(item.getSubject(), judgeNumber,item.getJudgeTotalScore(),item.getPaperId());
+            if (judges == null || judges.size() != judgeNumber) {
+                return ApiResultHandler.buildApiResult(400, "科目【" + item.getSubject() + "】题库【判断题】题目数量不足【" + judgeNumber + "】或者该主题的题目分数不足当前总分【" + item.getJudgeTotalScore() + "】，组卷失败", null);
+            }
         }
 
         // 符合组题条件，执行组题
         // 选择题
-        for (Integer number : changeNumbers) {
-            PaperManage paperManage = new PaperManage(paperId,1,number);
+        for (MultiQuestion m : changeNumberList) {
+            PaperManage paperManage = new PaperManage(paperId,1,m.getQuestionId());
             int index = paperService.add(paperManage);
             if(index==0)
                 return ApiResultHandler.buildApiResult(400,"选择题组卷保存失败",null);
         }
 
         // 填空题
-        for (Integer fillNum : fills) {
-            PaperManage paperManage = new PaperManage(paperId,2,fillNum);
+        for (FillQuestion f : fillList) {
+            PaperManage paperManage = new PaperManage(paperId,2,f.getQuestionId());
             int index = paperService.add(paperManage);
             if(index==0)
                 return ApiResultHandler.buildApiResult(400,"填空题题组卷保存失败",null);
         }
         // 判断题
-        for (Integer judge : judges) {
-            PaperManage paperManage = new PaperManage(paperId,3,judge);
+        for (JudgeQuestion j : judges) {
+            PaperManage paperManage = new PaperManage(paperId,3,j.getQuestionId());
             int index = paperService.add(paperManage);
             if(index==0)
                 return ApiResultHandler.buildApiResult(400,"判断题题组卷保存失败",null);
         }
 
 
-          return ApiResultHandler.buildApiResult(200,"试卷组卷成功",null);
+        return ApiResultHandler.buildApiResult(200,"试卷组卷成功",null);
     }
 }

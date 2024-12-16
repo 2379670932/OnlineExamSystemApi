@@ -24,7 +24,7 @@ public interface AnswerMapper {
      * @param questionId 选择题id
      * @return 选择题
      */
-    @Select("select questionId, subject, question, answerA, answerB, answerC, answerD, rightAnswer, section, level, analysis from multi_question where questionId = #{questionId}")
+    @Select("select questionId, subject, question, answerA, answerB, answerC, answerD, rightAnswer, section, level, analysis, score from multi_question where questionId = #{questionId}")
     MultiQuestion findMultiQuestionById(Long questionId);
 
     /**
@@ -33,7 +33,7 @@ public interface AnswerMapper {
      * @param questionId 题目id
      * @return 填空题
      */
-    @Select("select questionId, subject, question, answer, analysis, level, section from fill_question where questionId = #{questionId}")
+    @Select("select questionId, subject, question, answer, analysis, level, section, score from fill_question where questionId = #{questionId}")
     FillQuestion findFillQuestionById(Long questionId);
 
     /**
@@ -42,6 +42,6 @@ public interface AnswerMapper {
      * @param questionId 题目id
      * @return 判断题
      */
-    @Select("select questionId, subject, question, answer, analysis, level, section from judge_question where questionId = #{questionId}")
+    @Select("select questionId, subject, question, answer, analysis, level, section, score from judge_question where questionId = #{questionId}")
     JudgeQuestion findJudgeQuestionById(Long questionId);
 }

@@ -36,7 +36,6 @@ public class MultiQuestionController {
     public ApiResult edit(@RequestBody MultiQuestion multiQuestion) {
         int res = multiQuestionService.edit(multiQuestion);
         if (res != 0) {
-
             return ApiResultHandler.buildApiResult(200,"修改成功",res);
         }
         return ApiResultHandler.buildApiResult(400,"修改失败",res);

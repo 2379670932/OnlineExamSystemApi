@@ -25,13 +25,13 @@ public interface FillQuestionMapper {
     FillQuestion findOnlyQuestionId();
 
     @Options(useGeneratedKeys = true,keyProperty ="questionId" )
-    @Insert("insert into fill_question(subject,question,answer,analysis,level,section) values " +
-            "(#{subject},#{question},#{answer},#{analysis},#{level},#{section})")
+    @Insert("insert into fill_question(subject,question,answer,analysis,level,section,score) values " +
+            "(#{subject},#{question},#{answer},#{analysis},#{level},#{section}, #{score})")
     int add(FillQuestion fillQuestion);
 
-    @Select("select questionId from fill_question where subject = #{subject} order by rand() desc limit #{pageNo}")
-    List<Integer> findBySubject(@Param("subject") String subject, @Param("pageNo") Integer pageNo);
+    @Select("select questionId,score from fill_question where subject = #{subject} AND questionId not in(select questionId from paper_manage where paperId = #{paperId} and questionType = '2') order by rand() desc")
+    List<FillQuestion> findBySubject(@Param("subject") String subject,@Param("paperId") Integer paperId);
 
-    @Update("update fill_question set section = #{section}, question = #{question}, answer = #{answer}, level = #{level}, analysis = #{analysis} where questionId = #{questionId}")
+    @Update("update fill_question set section = #{section}, question = #{question}, answer = #{answer}, level = #{level}, analysis = #{analysis} , score = #{score} where questionId = #{questionId}")
     int edit(FillQuestion fillQuestion);
 }

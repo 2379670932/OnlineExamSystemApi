@@ -16,7 +16,8 @@ public interface JudgeQuestionService {
 
     int add(JudgeQuestion judgeQuestion);
 
-    List<Integer> findBySubject(String subject,Integer pageNo);
+
+    List<JudgeQuestion> findBySubject(String subject, Integer pageNo, Integer totalScore, Integer paperId);
 
     int edit(JudgeQuestion judgeQuestion);
 }
